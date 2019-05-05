@@ -13,12 +13,6 @@ NOSE = [i for i in range(31, 36)]
 # Defining mouth landmarks
 MOUTH = [i for i in range(48, 68)]
 
-# regex that identify the part section of the xml
-REG_PART = re.compile("part name='[0-9]+'")
-
-# regex that identify all the numbers (name, x, y) inside the part section
-REG_NUM = re.compile("[0-9]+")
-
 
 def main():
     # Original ibug model
@@ -32,10 +26,10 @@ def main():
     hmd_dat = os.path.join(os.path.dirname(os.path.abspath(__file__)), Path("hmd_face_landmarks.dat"))
 
     # Join all the points to be extracted in to a single array
-    POINTS = np.concatenate((FACE, NOSE, MOUTH), axis=None)
+    points = np.concatenate((FACE, NOSE, MOUTH), axis=None)
 
     # Create the training xml for the new model with only the desired points
-    slice_xml(input=ibug_xml, output=hmd_xml, points=POINTS)
+    slice_xml(input=ibug_xml, output=hmd_xml, points=points)
 
     # Train the model
     train_model(input_xml=hmd_xml, output_model=hmd_dat)
@@ -74,12 +68,18 @@ def slice_xml(input, output, points):
     :param points: Special set of landmarks to separate out.
 
     """
+    # regex that identify the part section of the xml
+    reg_part = re.compile("part name='[0-9]+'")
+
+    # regex that identify all the numbers (name, x, y) inside the part section
+    reg_num = re.compile("[0-9]+")
+
     input_file = open(input, "r")
     output_file = open(output, "w")
     points_to_extract = set(points)
 
     for line in input_file.readlines():
-        finds = re.findall(REG_PART, line)
+        finds = re.findall(reg_part, line)
 
         # find the part section
         if len(finds) <= 0:
@@ -87,7 +87,7 @@ def slice_xml(input, output, points):
         else:
             # we are inside the part section
             # so we can find the part name and the landmark x, y coordinates
-            name, x, y = re.findall(REG_NUM, line)
+            name, x, y = re.findall(reg_num, line)
 
             # if is one of the point i'm looking for, write in the output file
             if int(name) in points_to_extract:
