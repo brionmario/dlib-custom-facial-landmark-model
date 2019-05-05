@@ -8,10 +8,6 @@ labels_ibug_300W.xml
 labels_ibug_300W_test.xml
 labels_ibug_300W_train.xml
 
-# temporary keep the model and xml out of vcs
-hmd_face_landmarks.xml
-hmd_face_landmarks.dat
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
